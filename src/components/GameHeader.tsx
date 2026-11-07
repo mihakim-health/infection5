@@ -1,5 +1,4 @@
-import React from 'react';
-import { Volume2, VolumeX, BookOpen, RotateCcw } from 'lucide-react';
+import { Volume2, VolumeX, BookOpen, RotateCcw, Trophy } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
 interface GameHeaderProps {
@@ -13,6 +12,9 @@ interface GameHeaderProps {
   onToggleMute: () => void;
   onOpenGuide: () => void;
   onRestart: () => void;
+  nickname?: string;
+  classCode?: string;
+  onOpenLeaderboard?: () => void;
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({
@@ -26,6 +28,9 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   onToggleMute,
   onOpenGuide,
   onRestart,
+  nickname,
+  classCode,
+  onOpenLeaderboard,
 }) => {
   return (
     <header className="w-full bg-white/90 backdrop-blur-md border-b-2 border-amber-200 shadow-sm px-3 sm:px-6 py-2.5 sm:py-3 select-none">
@@ -38,8 +43,13 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               <h1 className="font-game text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
                 감염병 분류 디펜스
               </h1>
-              <div className="text-[11px] sm:text-xs text-amber-800 font-bold mt-0.5">
-                초등 5학년 보건 교과
+              <div className="text-[11px] sm:text-xs text-amber-800 font-bold mt-0.5 flex items-center gap-1.5">
+                <span>초등 5학년 보건</span>
+                {classCode && classCode !== 'all' && (
+                  <span className="px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-950 font-black">
+                    {classCode}반
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -53,6 +63,14 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             <span className="text-slate-400">/</span>
             <span>{totalQuestions}</span>
           </div>
+
+          {/* Student nickname badge */}
+          {nickname && (
+            <div className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-950 font-bold text-xs">
+              <span>🎒</span>
+              <span>{nickname}</span>
+            </div>
+          )}
         </div>
 
         {/* Center: Lives (Hearts) & Combo */}
@@ -99,6 +117,18 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
 
         {/* Right: Quick Tools (Sound Mute, Guide, Restart) */}
         <div className="flex items-center gap-1.5">
+          {onOpenLeaderboard && (
+            <button
+              type="button"
+              onClick={onOpenLeaderboard}
+              title="실시간 리더보드 보기"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition-colors cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-amber-600 fill-amber-500" />
+              <span className="hidden md:inline">리더보드</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onOpenGuide}

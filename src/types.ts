@@ -19,3 +19,18 @@ export interface PlayHistoryItem {
 export type GameStatus = 'READY' | 'PLAYING' | 'RESOLVING' | 'GAME_OVER' | 'VICTORY';
 
 export type GameSpeed = 'slow' | 'normal' | 'fast';
+
+export interface ScoreDoc {
+  id?: string;
+  nickname: string;
+  score: number;
+  classCode: string;
+  createdAt?: unknown;
+}
+
+export interface LeaderboardRankItem {
+  rank: number;
+  nickname: string;
+  score: number;
+  isMe: boolean;
+}

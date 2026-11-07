@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "PlayerProfile": {
+      "title": "PlayerProfile",
+      "description": "Anonymous student player profile without any personal information",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "User UID from anonymous authentication"
+        },
+        "nickname": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 8,
+          "pattern": "^[가-힣a-zA-Z]{2,8}$",
+          "description": "Korean or English nickname (2-8 characters)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "nickname", "createdAt"]
+    },
+    "Score": {
+      "title": "Score",
+      "description": "Game result score entry without personal info",
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 8,
+          "pattern": "^[가-힣a-zA-Z]{2,8}$",
+          "description": "Student nickname"
+        },
+        "score": {
+          "type": "number",
+          "description": "Final game score points"
+        },
+        "classCode": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Class identifier (e.g. 5-1 or all)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the game finished"
+        }
+      },
+      "required": ["nickname", "score", "classCode", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/players/{playerId}": {
+      "schema": "#/entities/PlayerProfile",
+      "description": "Stores anonymous student nickname mapping without PII"
+    },
+    "/scores/{scoreId}": {
+      "schema": "#/entities/Score",
+      "description": "Stores game scores for class leaderboard"
+    }
+  }
+}

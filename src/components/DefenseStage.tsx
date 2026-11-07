@@ -74,7 +74,7 @@ export const DefenseStage: React.FC<DefenseStageProps> = ({
 
         {/* Descending Germ Character */}
         <div
-          className="absolute inset-x-0 transition-[top] duration-100 ease-linear pointer-events-none"
+          className="absolute inset-x-0 pointer-events-none"
           style={{ top: `${topPercent}%` }}
         >
           <BacteriaCard

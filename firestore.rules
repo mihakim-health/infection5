@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common security helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for anonymous student player profile (NO PII allowed)
+    function isValidPlayerProfile(data) {
+      return data.keys().hasAll(['id', 'nickname', 'createdAt']) &&
+             data.keys().hasOnly(['id', 'nickname', 'createdAt']) &&
+             data.id is string && data.id == request.auth.uid &&
+             data.nickname is string && data.nickname.size() >= 2 && data.nickname.size() <= 8 &&
+             data.nickname.matches('^[가-힣a-zA-Z]{2,8}$') &&
+             data.createdAt is timestamp;
+    }
+
+    // Validation for leaderboard score entry (NO PII allowed)
+    function isValidScore(data) {
+      return data.keys().hasAll(['nickname', 'score', 'classCode', 'createdAt']) &&
+             data.keys().hasOnly(['nickname', 'score', 'classCode', 'createdAt']) &&
+             data.nickname is string && data.nickname.size() >= 2 && data.nickname.size() <= 8 &&
+             data.nickname.matches('^[가-힣a-zA-Z]{2,8}$') &&
+             data.score is number && data.score >= 0 && data.score <= 100000 &&
+             data.classCode is string && data.classCode.size() >= 1 && data.classCode.size() <= 32 &&
+             data.createdAt is timestamp;
+    }
+
+    // Test collection for initial connection validation
+    match /test/{docId} {
+      allow get: if true;
+    }
+
+    // Players collection: anonymous student profile without any personal information
+    match /players/{playerId} {
+      allow get: if isOwner(playerId);
+      allow list: if false; // Disallow querying all player profiles to protect student privacy
+
+      allow create: if isOwner(playerId) &&
+                       isValidId(playerId) &&
+                       isValidPlayerProfile(incoming()) &&
+                       incoming().createdAt == request.time;
+
+      allow update: if isOwner(playerId) &&
+                       isValidPlayerProfile(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['nickname']);
+
+      allow delete: if isOwner(playerId);
+    }
+
+    // Scores collection: class-based leaderboard entries
+    match /scores/{scoreId} {
+      allow read: if true;
+      allow create: if isSignedIn() &&
+                       isValidId(scoreId) &&
+                       isValidScore(incoming()) &&
+                       incoming().createdAt == request.time;
+      allow update, delete: if false; // scores are immutable
+    }
+  }
+}
