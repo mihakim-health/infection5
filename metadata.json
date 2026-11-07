@@ -1,0 +1,6 @@
+{
+  "name": "감염병 디펜스 - 5학년 보건 분류 게임",
+  "description": "초등학교 5학년 보건 수업용 감염병 전파 경로(소화기계, 호흡기계, 피부) 분류 디펜스 게임. 내려오는 세균을 알맞은 문으로 막고 예방 수칙을 익혀보세요.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
